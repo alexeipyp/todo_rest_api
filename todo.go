@@ -1,7 +1,7 @@
 package todo
 
 type TodoList struct {
-	Id          int    `json:"id"`
+	Id          int    `json:"id" db:"id"`
 	Title       string `json:"title" binding:"required"`
 	Description string `json:"description"`
 }
