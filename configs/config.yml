@@ -1,0 +1,8 @@
+port: "8000"
+
+db:
+  username: "alexeipyp"
+  host: "ep-damp-frog-85085679.eu-central-1.aws.neon.tech"
+  port: "5432"
+  dbname: "testdb"
+  sslmode: "require"
