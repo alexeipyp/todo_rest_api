@@ -1,7 +1,10 @@
 package main
 
 import (
+	"context"
 	"os"
+	"os/signal"
+	"syscall"
 
 	todo "github.com/alexeipyp/todo_rest_api"
 	"github.com/alexeipyp/todo_rest_api/pkg/handler"
@@ -41,8 +44,21 @@ func main() {
 	handlers := handler.New(servises)
 
 	srv := new(todo.Server)
-	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-		logrus.Fatalf("error: %s", err.Error())
+	go func() {
+		if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
+			logrus.Fatalf("error: %s", err.Error())
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+	<-quit
+
+	if err := srv.Shutdown(context.Background()); err != nil {
+		logrus.Errorf("error occured while server shutting down: %s", err.Error())
+	}
+	if err := db.Close(); err != nil {
+		logrus.Errorf("error occured while closing db connection: %s", err.Error())
 	}
 }
 
